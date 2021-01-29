@@ -11,10 +11,29 @@
 GLFWwindow* window;
 GLuint vao;
 
-// initialize velocity and pressure mesh
+
+//screen resolution set at 600 X 600;
+float scr_w = 600;
+float scr_h = 600;
+// box dimensions
+float len_x = 1.0;
+float len_y = 1.0;
+// grid spacing
+float dx = len_x/(scr_w - 1.0);
+float dy = len_y/(scr_h - 1.0);
+// initialize velocity and pressure
 float u[600][600] = {};
 float v[600][600] = {};
 float p[600][600] = {};
+// node x and y ordinates
+float x[600][600] = {};
+float y[600][600] = {};
+// time increment
+float dt = 0.1;
+
+// fluid properties pressure and viscosity
+float rho = 1.0;
+float vis = 0.1;
 
 
 const GLchar *fragment_shader = "\
@@ -117,10 +136,27 @@ for(int i = 0;i<600;++i)
     u[599][i] = 1.0;
 
 
-
 while(!glfwWindowShouldClose(window))
 {
     glfwPollEvents();
+    
+    //-----------Start Simulation
+    int i;
+    int j;    
+
+    float t1 =  u[i][j] - u[i][j]*(u[i][j] - u[i-1][j]) * (dt/dx) - v[i][j]*(u[i][j] - u[i][j-1]) * (dt/dy) - (1.0/rho)*(p[i+1][j] - p[i-1][j]) * (dt/(2*dx));
+    float t2 = vis * ( (u[i+1][j] - 2*u[i][j] + u[i-1][j])*(dt/(dx*dx)) + (u[i][j+1] - 2*u[i][j] + u[i][j-1])*(dt/(dy*dy)) );
+    u[i][j] + t1 + t2;
+    
+    float t3 =  v[i][j] - u[i][j]*(v[i][j] - v[i-1][j]) * (dt/dx) - v[i][j]*(v[i][j] - v[i][j-1]) * (dt/dy) - (1.0/rho)*(p[i+1][j] - p[i-1][j]) * (dt/(2*dy));
+    float t4 = vis * ( (v[i+1][j] - 2*v[i][j] + v[i-1][j])*(dt/(dx*dx)) + (v[i][j+1] - 2*v[i][j] + v[i][j-1])*(dt/(dy*dy)) ); 
+    v[i][j] + t3 + t4;
+    
+    
+    float b1 = ( (p[i+1][j] + p[i-1][j]) * (dy*dy) + (p[i][j+1] + p[i][j-1]) * (dx*dx) )/(2*(dx*dx+dy*dy));
+    float b2 = ( (rho * dx*dx*dy*dy)/(2*dt*(dx*dx+dy*dy)) ) * ( (u[i+1][j] - u[i-1][j])/(2*dx) +(v[i][j+1] - v[i][j-1])/(2*dy*dy) );  
+    float b3 = ( (rho * dx*dx*dy*dy)/(2*(dx*dx+dy*dy)) ) *  
+    //----------End Simulation
     
     glClearColor(0.0,0.0,0.1,1.0); 
     glClear(GL_COLOR_BUFFER_BIT);
