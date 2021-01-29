@@ -2,6 +2,8 @@
 // using fdm to generate realtime fluid simulation
 // author - Nathan Rising
 // last revision - 01/23/2021 
+// Testing...
+
 
 #include <iostream>
 #define GLEW_STATIC
@@ -132,30 +134,59 @@ int main(int argv,char* argc[]){
 init();
 
 // set boundary conditions x velocity to zero
-for(int i = 0;i<600;++i)
-    u[599][i] = 1.0;
+for(int i = 0;i<50;++i)
+    u[49][i] = 1.0;
 
-
+int var_test = 5;
 while(!glfwWindowShouldClose(window))
 {
     glfwPollEvents();
     
-    //-----------Start Simulation
-    int i;
-    int j;    
-
-    float t1 =  u[i][j] - u[i][j]*(u[i][j] - u[i-1][j]) * (dt/dx) - v[i][j]*(u[i][j] - u[i][j-1]) * (dt/dy) - (1.0/rho)*(p[i+1][j] - p[i-1][j]) * (dt/(2*dx));
-    float t2 = vis * ( (u[i+1][j] - 2*u[i][j] + u[i-1][j])*(dt/(dx*dx)) + (u[i][j+1] - 2*u[i][j] + u[i][j-1])*(dt/(dy*dy)) );
-    u[i][j] + t1 + t2;
+    //-----------Start Simulation    
+    // testing...
+    while(var_test != 0){ 
+    var_test--;
+    std::cout<<var_test<<'\n';
+   
+    for(int i = 1;i < 50;++i)
+    {
+        for(int j = 1;j < 50;++j)
+        {
+            float t1 = u[i][j] - u[i][j]*(u[i][j] - u[i-1][j]) * (dt/dx); 
+            float t2 = -v[i][j]*(u[i][j] - u[i][j-1]) * (dt/dy); 
+            float t3 = -(1.0/rho)*(p[i+1][j] - p[i-1][j]) * (dt/(2*dx));
+            float t4 = vis * ( (u[i+1][j] - 2*u[i][j] + u[i-1][j])*(dt/(dx*dx)) ); 
+            float t5 = vis * ( (u[i][j+1] - 2*u[i][j] + u[i][j-1])*(dt/(dy*dy)) );
+            u[i][j] + t1 + t2 + t3 + t4 + t5;
+            
+            float s1 = v[i][j] - u[i][j]*(v[i][j] - v[i-1][j]) * (dt/dx); 
+            float s2 = -v[i][j]*(v[i][j] - v[i][j-1]) * (dt/dy); 
+            float s3 = -(1.0/rho)*(p[i+1][j] - p[i-1][j]) * (dt/(2*dy));
+            float s4 = vis * ( (v[i+1][j] - 2*v[i][j] + v[i-1][j])*(dt/(dx*dx)) ); 
+            float s5 = vis * ( (v[i][j+1] - 2*v[i][j] + v[i][j-1])*(dt/(dy*dy)) ); 
+            v[i][j] + s1 + s2 + s3 + s4 + s5;
+                
+            float b1 = ( (p[i+1][j] + p[i-1][j]) * (dy*dy) + (p[i][j+1] + p[i][j-1]) * (dx*dx) )/(2*(dx*dx+dy*dy));
+            float b2 = ( (rho * dx*dx*dy*dy)/(2*dt*(dx*dx+dy*dy)) ) * ( (u[i+1][j] - u[i-1][j])/(2*dx) +(v[i][j+1] - v[i][j-1])/(2*dy*dy) );  
+            float b3 = ( (rho * dx*dx*dy*dy)/(2*(dx*dx+dy*dy)) ) * ( ( (u[i+1][j] - u[i-1][j])/(2*dx) )*( (u[i+1][j] - u[i-1][j])/(2*dx) ) );
+            float b4 = ( (rho * dx*dx*dy*dy)/(2*(dx*dx+dy*dy)) ) * ( 2 * ( (u[i][j+1] - u[i][j-1])/(2*dy) ) * ( (v[i+1][j] - v[i-1][j])/(2*dx) ) );
+            float b5 = ( (rho * dx*dx*dy*dy)/(2*(dx*dx+dy*dy)) ) * ( ( (v[i][j+1] - v[i][j-1])/(2*dy) )*( (v[i][j+1] - v[i][j-1])/(2*dy) ) );    
+            p[i][j] = b1 + b2 + b3 + b4 + b5;
+        }
+    }
     
-    float t3 =  v[i][j] - u[i][j]*(v[i][j] - v[i-1][j]) * (dt/dx) - v[i][j]*(v[i][j] - v[i][j-1]) * (dt/dy) - (1.0/rho)*(p[i+1][j] - p[i-1][j]) * (dt/(2*dy));
-    float t4 = vis * ( (v[i+1][j] - 2*v[i][j] + v[i-1][j])*(dt/(dx*dx)) + (v[i][j+1] - 2*v[i][j] + v[i][j-1])*(dt/(dy*dy)) ); 
-    v[i][j] + t3 + t4;
+    for(int k = 0;k<50;++k)
+    {
+        for(int l = 0;l<50;++l)
+        {
+            std::cout<<u[k][l]<<" "; 
+        }
+        std::cout<<'\n';
+    }
     
-    
-    float b1 = ( (p[i+1][j] + p[i-1][j]) * (dy*dy) + (p[i][j+1] + p[i][j-1]) * (dx*dx) )/(2*(dx*dx+dy*dy));
-    float b2 = ( (rho * dx*dx*dy*dy)/(2*dt*(dx*dx+dy*dy)) ) * ( (u[i+1][j] - u[i-1][j])/(2*dx) +(v[i][j+1] - v[i][j-1])/(2*dy*dy) );  
-    float b3 = ( (rho * dx*dx*dy*dy)/(2*(dx*dx+dy*dy)) ) *  
+    std::cout<<"\n";   
+						
+   }
     //----------End Simulation
     
     glClearColor(0.0,0.0,0.1,1.0); 
