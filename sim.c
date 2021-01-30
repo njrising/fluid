@@ -46,8 +46,6 @@ void main(){\
 }\
 ";
 
-
-
 const GLchar *vertex_shader = "\
 #version 120\n\
 attribute vec4 in_color;\
