@@ -1,5 +1,5 @@
 // lid driven cavity flow simulation
-// using fdm to generate realtime fluid simulation
+// using fdm to generate realtime fluid simulation.
 // author - Nathan Rising
 // last revision - 01/23/2021 
 // Testing...
